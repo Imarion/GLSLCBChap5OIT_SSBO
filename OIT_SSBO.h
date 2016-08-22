@@ -77,7 +77,7 @@ private:
     VBOCube   *mCube;
     VBOSphere *mSphere;
 
-    QMatrix4x4 ModelMatrixSphere, ViewMatrix, ProjectionMatrix;
+    QMatrix4x4 ModelMatrixSphere, ModelMatrixCube, ViewMatrix, ProjectionMatrix;
 
     //debug
     void printMatrix(const QMatrix4x4& mat);

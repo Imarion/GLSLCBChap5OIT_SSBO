@@ -276,7 +276,6 @@ void MyWindow::render()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
     pass1();
     //pass2();
 
@@ -295,7 +294,7 @@ void MyWindow::pass1()
     mFuncs->glBindVertexArray(mVAOSphere);
 
     glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);    
+    glEnableVertexAttribArray(1);
 
     mProgram->bind();
     {
@@ -339,59 +338,110 @@ void MyWindow::pass1()
     mProgram->release();
 
     // *** Draw cubes
-    /*
-    mFuncs->glBindVertexArray(mVAOPlane);
+    mFuncs->glBindVertexArray(mVAOCube);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    mProgram->bind();
+    mProgram->bind();      
     {
         mFuncs->glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &pass1Index);
 
-        mProgram->setUniformValue("Lights[0].Position", ViewMatrix * worldLightl);
-        mProgram->setUniformValue("Lights[1].Position", ViewMatrix * worldLightm);
-        mProgram->setUniformValue("Lights[2].Position", ViewMatrix * worldLightr);
-
-        mProgram->setUniformValue("Lights[0].Intensity", intense );
-        mProgram->setUniformValue("Lights[1].Intensity", intense );
-        mProgram->setUniformValue("Lights[2].Intensity", intense );
+        mProgram->setUniformValue("Light.Position",  QVector4D(0.0f, 0.0f, 0.0f, 1.0f));
+        mProgram->setUniformValue("Light.Intensity", QVector3D(0.9f, 0.9f, 0.9f));
 
         mProgram->setUniformValue("ViewNormalMatrix", ViewMatrix.normalMatrix());
 
-        mProgram->setUniformValue("Material.Kd", 0.9f, 0.3f, 0.2f);
-        mProgram->setUniformValue("Material.Ks", 1.0f, 1.0f, 1.0f);
-        mProgram->setUniformValue("Material.Ka", 0.2f, 0.2f, 0.2f);
-        mProgram->setUniformValue("Material.Shininess", 100.0f);
+        mProgram->setUniformValue("Material.Kd", 0.9f, 0.2f, 0.2f, 0.4f);
+        mProgram->setUniformValue("Material.Ka", 0.0f, 0.0f, 0.0f, 0.0f);
 
-        // back plane
-        QMatrix4x4 mvback = ViewMatrix * ModelMatrixBackPlane;
-        mProgram->setUniformValue("ModelViewMatrix", mvback);
-        mProgram->setUniformValue("NormalMatrix", mvback.normalMatrix());
-        mProgram->setUniformValue("MVP", ProjectionMatrix * mvback);
-        glDrawElements(GL_TRIANGLES, 6 * mPlane->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+        float size = 2.0f;
+        float pos  = 1.75f;
 
-        // Top plane
-        QMatrix4x4 mvtop = ViewMatrix * ModelMatrixTopPlane;
-        mProgram->setUniformValue("ModelViewMatrix", mvtop);
-        mProgram->setUniformValue("NormalMatrix", mvtop.normalMatrix());
-        mProgram->setUniformValue("MVP", ProjectionMatrix * mvtop);
-        glDrawElements(GL_TRIANGLES, 6 * mPlane->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(-pos, -pos, pos);
+        ModelMatrixCube.scale(size);
 
-        // Bot plane
-        QMatrix4x4 mvbot = ViewMatrix * ModelMatrixBotPlane;
-        mProgram->setUniformValue("ModelViewMatrix", mvbot);
-        mProgram->setUniformValue("NormalMatrix", mvbot.normalMatrix());
-        mProgram->setUniformValue("MVP", ProjectionMatrix * mvbot);
+        QMatrix4x4 mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 
-        glDrawElements(GL_TRIANGLES, 6 * mPlane->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(-pos, -pos, -pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(-pos, pos, pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(-pos, pos, -pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(pos, pos, pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(pos, pos, -pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(pos, -pos, pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+        ModelMatrixCube.setToIdentity();
+        ModelMatrixCube.translate(pos, -pos, -pos);
+        ModelMatrixCube.scale(size);
+
+        mv2 = ViewMatrix * ModelMatrixCube;
+        mProgram->setUniformValue("ModelViewMatrix", mv2);
+        mProgram->setUniformValue("NormalMatrix", mv2.normalMatrix());
+        mProgram->setUniformValue("MVP", ProjectionMatrix * mv2);
+        glDrawElements(GL_TRIANGLES, 6 * mCube->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
     }    
     mProgram->release();
-    */
-
 }
 
 void MyWindow::pass2()
