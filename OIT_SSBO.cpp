@@ -14,6 +14,7 @@
 #include <cmath>
 #include <cstring>
 #include <sstream>
+#include <vector>
 
 MyWindow::~MyWindow()
 {
@@ -82,6 +83,7 @@ void MyWindow::initialize()
     pass2Index = mFuncs->glGetSubroutineIndex( mProgram->programId(), GL_FRAGMENT_SHADER, "pass2");
 
     initMatrices();
+    initShaderStorage();
 
     glFrontFace(GL_CCW);
     glEnable(GL_DEPTH_TEST);
@@ -355,6 +357,8 @@ void MyWindow::pass1()
         mProgram->setUniformValue("Material.Kd", 0.9f, 0.2f, 0.2f, 0.4f);
         mProgram->setUniformValue("Material.Ka", 0.0f, 0.0f, 0.0f, 0.0f);
 
+        mProgram->setUniformValue("MaxNodes", maxNodes);
+
         float size = 2.0f;
         float pos  = 1.75f;
 
@@ -484,6 +488,32 @@ void MyWindow::pass2()
         glDisableVertexAttribArray(2);
     }
     mProgram->release();
+}
+
+void MyWindow::initShaderStorage()
+{
+    glGenBuffers(2, buffers);
+    maxNodes        = 20 * this->width() * this->height();
+    GLint  nodeSize = 5 * sizeof(GLfloat) + sizeof(GLuint); // The size of a linked list node
+
+    // Our atomic counter
+    mFuncs->glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, buffers[COUNTER_BUFFER]);
+    glBufferData(GL_ATOMIC_COUNTER_BUFFER, sizeof(GLuint), NULL, GL_DYNAMIC_DRAW);
+
+    // The buffer for the head pointers, as an image texture
+    glGenTextures(1, &headPtrTex);
+    glBindTexture(GL_TEXTURE_2D, headPtrTex);
+    mFuncs->glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32UI, this->width(), this->height());
+    mFuncs->glBindImageTexture(0, headPtrTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
+
+    // The buffer of linked lists
+    mFuncs->glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buffers[LINKED_LIST_BUFFER]);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, maxNodes * nodeSize, NULL, GL_DYNAMIC_DRAW);
+
+    std::vector<GLuint> headPtrClearBuf(this->width() * this->height(), 0xffffffff);
+    glGenBuffers(1, &clearBuf);
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, clearBuf);
+    glBufferData(GL_PIXEL_UNPACK_BUFFER, headPtrClearBuf.size() * sizeof(GLuint), &headPtrClearBuf[0], GL_STATIC_COPY);
 }
 
 

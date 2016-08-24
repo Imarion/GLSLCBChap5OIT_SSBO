@@ -23,6 +23,12 @@
 #define ToDegree(x) ((x) * 180.0f / M_PI)
 #define TwoPI (float)(2 * M_PI)
 
+enum BufferNames {
+  COUNTER_BUFFER = 0,
+  LINKED_LIST_BUFFER
+};
+
+
 //class MyWindow : public QWindow, protected QOpenGLFunctions_3_3_Core
 class MyWindow : public QWindow, protected QOpenGLFunctions
 {
@@ -42,9 +48,8 @@ private:
 
     void initShaders();
     void CreateVertexBuffer();    
-    void initMatrices();
-    void setupFBO();
-    void setupSamplers();
+    void initMatrices();    
+    void initShaderStorage();
 
     void pass1();
     void pass2();
@@ -73,6 +78,8 @@ private:
     GLuint mRotationMatrixLocation;
 
     GLuint pass1Index, pass2Index;
+    GLuint buffers[2], headPtrTex, clearBuf;
+    GLuint maxNodes;
 
     VBOCube   *mCube;
     VBOSphere *mSphere;
