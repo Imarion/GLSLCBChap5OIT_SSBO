@@ -275,11 +275,12 @@ void MyWindow::render()
     EvolvingVal += 0.1f;
     */
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    clearBuffers();
     pass1();
-    //pass2();
+    pass2();
 
     mContext->swapBuffers(this);
 }
@@ -289,9 +290,14 @@ void MyWindow::pass1()
     glViewport(0, 0, this->width(), this->height());
 
     glClearColor(0.5f,0.5f,0.5f,1.0f);    
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
+    glDepthMask(GL_FALSE);
 
+    DrawScene();
+}
+
+void MyWindow::DrawScene()
+{
     // *** Draw spheres
     mFuncs->glBindVertexArray(mVAOSphere);
 
@@ -450,17 +456,9 @@ void MyWindow::pass1()
 
 void MyWindow::pass2()
 {    
+    mFuncs->glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    //glBindFramebuffer(GL_FRAMEBUFFER, blurFbo);
-
-    // We're writing to tex1 this time
-    //glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex1, 0);
-
-    //glViewport(0, 0, bloomBufWidth, bloomBufHeight);
-    glDisable(GL_DEPTH_TEST);
-
-    glClearColor(0,0,0,0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     mFuncs->glBindVertexArray(mVAOFSQuad);
 
@@ -471,8 +469,6 @@ void MyWindow::pass2()
     mProgram->bind();
     {
         mFuncs->glUniformSubroutinesuiv( GL_FRAGMENT_SHADER, 1, &pass2Index);
-
-        mProgram->setUniformValue("LumThresh", 1.7f);
 
         QMatrix4x4 mv1 ,proj;
 
@@ -515,6 +511,18 @@ void MyWindow::initShaderStorage()
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, clearBuf);
     glBufferData(GL_PIXEL_UNPACK_BUFFER, headPtrClearBuf.size() * sizeof(GLuint), &headPtrClearBuf[0], GL_STATIC_COPY);
 }
+
+void MyWindow::clearBuffers() {
+    GLuint zero = 0;
+
+    mFuncs->glBindBufferBase(GL_ATOMIC_COUNTER_BUFFER, 0, buffers[COUNTER_BUFFER] );
+    glBufferSubData(GL_ATOMIC_COUNTER_BUFFER, 0, sizeof(GLuint), &zero);
+
+    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, clearBuf);
+    glBindTexture(GL_TEXTURE_2D, headPtrTex);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, this->width(), this->height(), GL_RED_INTEGER, GL_UNSIGNED_INT, NULL);
+}
+
 
 
 void MyWindow::initShaders()

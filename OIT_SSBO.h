@@ -50,8 +50,10 @@ private:
     void CreateVertexBuffer();    
     void initMatrices();    
     void initShaderStorage();
+    void clearBuffers();
 
     void pass1();
+    void DrawScene();
     void pass2();
 
     void  PrepareTexture(GLenum TextureTarget, const QString& FileName, GLuint& TexObject, bool flip);
