@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QImage>
 #include <QTime>
+#include <QElapsedTimer>
 
 #include <QVector2D>
 #include <QVector3D>
@@ -298,6 +299,8 @@ void MyWindow::pass1()
 
 void MyWindow::DrawScene()
 {
+    GLint MaxNodeLocation = glGetUniformLocation(mProgram->programId(), "MaxNodes");
+
     // *** Draw spheres
     mFuncs->glBindVertexArray(mVAOSphere);
 
@@ -314,7 +317,10 @@ void MyWindow::DrawScene()
         mProgram->setUniformValue("ViewNormalMatrix", ViewMatrix.normalMatrix());
 
         mProgram->setUniformValue("Material.Kd", 0.2f, 0.2f, 0.9f, 0.55f);
-        mProgram->setUniformValue("Material.Ka", 0.0f, 0.0f, 0.0f, 0.0f);
+        mProgram->setUniformValue("Material.Ka", 0.0f, 0.0f, 0.0f, 0.0f);               
+
+        //mProgram->setUniformValue("MaxNodes", maxNodes);
+        mFuncs->glUniform1ui(MaxNodeLocation, maxNodes);
 
         float size = 0.45f;
         for (int i=0; i<=6; i++)
@@ -363,7 +369,8 @@ void MyWindow::DrawScene()
         mProgram->setUniformValue("Material.Kd", 0.9f, 0.2f, 0.2f, 0.4f);
         mProgram->setUniformValue("Material.Ka", 0.0f, 0.0f, 0.0f, 0.0f);
 
-        mProgram->setUniformValue("MaxNodes", maxNodes);
+        //mProgram->setUniformValue("MaxNodes", maxNodes);
+        mFuncs->glUniform1ui(MaxNodeLocation, maxNodes);
 
         float size = 2.0f;
         float pos  = 1.75f;
@@ -458,7 +465,7 @@ void MyWindow::pass2()
 {    
     mFuncs->glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);    
 
     mFuncs->glBindVertexArray(mVAOFSQuad);
 

@@ -59,7 +59,7 @@ void pass1() {
     uint nodeIdx = atomicCounterIncrement(nextNodeCounter);
 
     // Is our buffer full?  If so, we don't add the fragment
-    // to the list.
+    // to the list.        
     if (nodeIdx < MaxNodes)
     {
         // Our fragment will be the new head of the linked list, so
@@ -76,7 +76,7 @@ void pass1() {
         nodes[nodeIdx].color = vec4(diffuse(), Material.Kd.a);
         nodes[nodeIdx].depth = gl_FragCoord.z;
         nodes[nodeIdx].next  = prevHead;
-    }
+    }    
 }
 
 // Bright-pass filter (write to BlurTex1)
@@ -118,10 +118,10 @@ void pass2()
     }
 
     // Output the final color
-    //FragColor = color;
+    FragColor = color;
+    //FragColor = nodes[0].color;
     //FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-    //FragColor = vec4((float(count) * ((255.0)/MAX_FRAGMENTS)) /255.0 + 0.9, 0.0, 0.0, 1.0);;
-    FragColor = vec4(float(MAX_FRAGMENTS) / float(MAX_FRAGMENTS), 0.0, 0.0, 1.0);
+
 }
 
 void main()

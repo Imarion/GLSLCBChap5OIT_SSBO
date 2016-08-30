@@ -2,7 +2,7 @@ QT += gui core
 
 CONFIG += c++11
 
-TARGET = HDRToneMap
+TARGET = OIT_SSBO
 CONFIG += console
 CONFIG -= app_bundle
 

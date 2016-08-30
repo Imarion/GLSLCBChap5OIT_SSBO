@@ -81,7 +81,7 @@ private:
 
     GLuint pass1Index, pass2Index;
     GLuint buffers[2], headPtrTex, clearBuf;
-    GLuint maxNodes;
+    unsigned int maxNodes;
 
     VBOCube   *mCube;
     VBOSphere *mSphere;
