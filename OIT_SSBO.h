@@ -82,6 +82,10 @@ private:
     GLuint pass1Index, pass2Index;
     GLuint buffers[2], headPtrTex, clearBuf;
     unsigned int maxNodes;
+    QMatrix4x4 ModelMatrixSphere2[6*6*6];
+    QMatrix4x4 MVMatrixSphere2[6*6*6];
+    QMatrix4x4 ViewMatrixNormal[6*6*6];
+    QMatrix4x4 MVPMatrix[6*6*6];
 
     VBOCube   *mCube;
     VBOSphere *mSphere;

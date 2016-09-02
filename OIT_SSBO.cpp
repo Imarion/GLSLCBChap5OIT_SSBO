@@ -236,6 +236,34 @@ void MyWindow::initMatrices()
     //ModelMatrixPlane.translate(0.0f, -0.45f, 0.0f);
 
     ViewMatrix.lookAt(QVector3D(11.0f * cos(angle), 2.0f, 11.0f * sin(angle)), QVector3D(0.0f,0.0f,0.0f), QVector3D(0.0f,1.0f,0.0f));
+
+    int NumSphereFaces = mSphere->getnFaces();
+
+    QMatrix4x4 projmat;
+    projmat.perspective(50.0f, (float)this->width()/(float)this->height(), 1.0f, 1000.0f);
+
+    int idx = 0;
+    QMatrix4x4 mv1;
+    float size = 0.45f;
+    for (int i=0; i<=6; i++)
+    {
+        for( int j=0; j<=6; j++)
+        {
+            for( int k=0; k<=6; k++)
+            {
+                if( (i+j+k)%2 == 0)
+                {
+                    ModelMatrixSphere2[idx].translate(i-3, j-3, k-3);
+                    ModelMatrixSphere2[idx].scale(size);
+                    MVMatrixSphere2[idx] = ViewMatrix * ModelMatrixSphere2[idx];
+                    ViewMatrixNormal[idx].normalMatrix();
+                    MVPMatrix[idx] = projmat * MVMatrixSphere2[idx];
+
+                    idx++;
+                }
+            }
+        }
+    }
 }
 
 void MyWindow::resizeEvent(QResizeEvent *)
@@ -298,14 +326,17 @@ void MyWindow::pass1()
 }
 
 void MyWindow::DrawScene()
-{
+{    
     GLint MaxNodeLocation = glGetUniformLocation(mProgram->programId(), "MaxNodes");
+    int NumSphereFaces = mSphere->getnFaces();
 
     // *** Draw spheres
     mFuncs->glBindVertexArray(mVAOSphere);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+
+    QMatrix4x4 mv1;
 
     mProgram->bind();
     {
@@ -322,6 +353,7 @@ void MyWindow::DrawScene()
         //mProgram->setUniformValue("MaxNodes", maxNodes);
         mFuncs->glUniform1ui(MaxNodeLocation, maxNodes);
 
+        int idx = 0;
         float size = 0.45f;
         for (int i=0; i<=6; i++)
         {
@@ -331,16 +363,14 @@ void MyWindow::DrawScene()
                 {
                     if( (i+j+k)%2 == 0)
                     {
-                        ModelMatrixSphere.setToIdentity();
-                        ModelMatrixSphere.translate(i-3, j-3, k-3);
-                        ModelMatrixSphere.scale(size);
 
-                        QMatrix4x4 mv1 = ViewMatrix * ModelMatrixSphere;
-                        mProgram->setUniformValue("ModelViewMatrix", mv1);
-                        mProgram->setUniformValue("NormalMatrix", mv1.normalMatrix());
-                        mProgram->setUniformValue("MVP", ProjectionMatrix * mv1);
+                        mProgram->setUniformValue("ModelViewMatrix", MVMatrixSphere2[idx]);
+                        mProgram->setUniformValue("NormalMatrix", ViewMatrixNormal[idx]);
+                        mProgram->setUniformValue("MVP", MVPMatrix[idx]);
 
-                        glDrawElements(GL_TRIANGLES, mSphere->getnFaces(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+                        glDrawElements(GL_TRIANGLES, NumSphereFaces, GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
+
+                        idx++;
                     }
                 }
             }
